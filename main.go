@@ -1,12 +1,28 @@
 package main
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"test/dao"
 	"test/service"
 )
 
+import (
+	"github.com/spf13/viper"
+)
+
 func main() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.AddConfigPath(".")
+
+	if err := viper.ReadInConfig(); err != nil {
+		var configFileNotFoundError viper.ConfigFileNotFoundError
+		if errors.As(err, &configFileNotFoundError) {
+			panic("Config file not found; please make sure config.json is in the current directory.")
+		}
+	}
+
 	d := dao.NewDao()
 	s := service.NewService(d)
 
